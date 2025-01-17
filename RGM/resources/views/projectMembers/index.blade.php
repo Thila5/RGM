@@ -11,7 +11,17 @@
                 <div class="p-6 text-gray-900 dark:text-gray-100">
                     <a href="{{ route('projectMembers.create') }}" class="btn btn-primary mb-4">Add/Update Project Member</a>
 
-                    @forelse($researchGrants as $grant)
+                    @foreach($researchGrants as $grant)
+                        @if (!$grant->projectLeader) 
+                            <!-- If the project leader is deleted, remove the grant from the page -->
+                            @php
+                                // Delete the grant if the project leader is missing
+                                $grant->delete();
+                            @endphp
+                            <!-- Skip displaying this grant -->
+                            @continue
+                        @endif
+
                         <div class="mb-6 border-b border-gray-300 dark:border-gray-600 pb-4">
                             <!-- Link to view the specific research grant -->
                             <h3 class="text-lg font-medium text-white mb-2">
@@ -23,7 +33,9 @@
                             <!-- Display the Project Leader -->
                             <div class="mb-4">
                                 <strong>Project Leader:</strong>
-                                <span class="text-gray-900 dark:text-gray-100">{{ $grant->projectLeader->name }}</span>
+                                <span class="text-gray-900 dark:text-gray-100">
+                                    {{ $grant->projectLeader->name }}
+                                </span>
                             </div>
 
                             <!-- Check if there are project members excluding the leader -->
@@ -59,9 +71,11 @@
                                 <p class="text-sm text-gray-500 dark:text-gray-400">No project members added yet.</p>
                             @endif
                         </div>
-                    @empty
+                    @endforeach
+
+                    @if($researchGrants->isEmpty())
                         <p class="text-sm text-gray-500 dark:text-gray-400">No research grants available.</p>
-                    @endforelse
+                    @endif
                 </div>
             </div>
         </div>

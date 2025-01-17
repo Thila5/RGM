@@ -1,13 +1,13 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-2xl text-black leading-tight">
+        <h2 class="font-semibold text-2xl text-white leading-tight text-center py-6">
             {{ __('Add Academician') }}
         </h2>
     </x-slot>
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-lg sm:rounded-lg">
+            <div class="bg-white overflow-hidden shadow-lg sm:rounded-xl">
                 <div class="p-8 text-black">
                     <form action="{{ route('academicians.store') }}" method="POST" class="space-y-6">
                         @csrf
@@ -85,6 +85,24 @@
 
             document.getElementById('selected_name').value = name;
             document.getElementById('email').value = email;
+        });
+
+        // Check staff number duplication
+        document.getElementById('staff_number').addEventListener('blur', function () {
+            const staffNumber = this.value;
+
+            fetch('/check-staff-number?staff_number=' + staffNumber)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.exists) {
+                        alert("This staff number is already in use. Please enter a different staff number.");
+                        document.getElementById('staff_number').value = ''; // Clear the input
+                        document.getElementById('staff_number').focus(); // Focus the input field
+                    }
+                })
+                .catch(error => {
+                    console.error('Error checking staff number:', error);
+                });
         });
     </script>
 

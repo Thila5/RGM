@@ -10,7 +10,9 @@ class CreateResearchGrantsTable extends Migration
     {
         Schema::create('research_grants', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('project_leader_id')->constrained('academicians');
+            $table->foreignId('project_leader_id')
+                  ->constrained('academicians') // Assuming 'academicians' is your project leaders table
+                  ->onDelete('cascade'); // Automatically delete grants if the project leader is deleted
             $table->decimal('grant_amount', 15, 2);
             $table->string('grant_provider');
             $table->string('project_title');

@@ -23,7 +23,7 @@ class CreateProjectMilestonesTable extends Migration
 
     public function down()
     {
-        Schema::dropIfExists('project_milestones');
+        Schema::dropIfEpxists('project_milestones');
     }
 }
 

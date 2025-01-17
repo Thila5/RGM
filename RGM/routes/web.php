@@ -7,10 +7,15 @@ use App\Http\Controllers\ResearchGrantController;
 use App\Http\Controllers\ProjectMilestoneController;
 use App\Http\Controllers\ProjectMemberController;
 
-
 Route::get('/', function () {
     return view('auth/login');
 });
+
+Route::get('/check-staff-number', [AcademicianController::class, 'checkStaffNumber']);
+Route::middleware('auth')->group(function() {
+    Route::resource('researchGrants', ResearchGrantController::class);
+});
+
 
 Route::get('/dashboard', function () {
     return view('dashboard');
@@ -33,6 +38,5 @@ Route::resource('projectMilestones', ProjectMilestoneController::class);
 
 // Resource routes for project members
 Route::resource('projectMembers', ProjectMemberController::class);
-
 
 require __DIR__.'/auth.php';

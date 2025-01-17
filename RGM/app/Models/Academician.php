@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -35,5 +34,16 @@ class Academician extends Model
         return $this->belongsToMany(ResearchGrant::class, 'project_members')
                     ->withPivot('id')
                     ->withTimestamps();
+    }
+
+    // Automatically delete associated research grants when Academician is deleted
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function ($academician) {
+            // Delete all research grants associated with the academician
+            $academician->projectLeads()->delete();
+        });
     }
 }

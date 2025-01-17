@@ -7,7 +7,7 @@
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <!-- Card to add a new research grant with dark background color -->
+            <!-- Card to add a new research grant -->
             <div class="bg-gray-800 dark:bg-gray-900 p-6 rounded-lg shadow-xl mb-6">
                 <a href="{{ route('researchGrants.create') }}" class="inline-block bg-blue-600 text-white font-semibold py-3 px-6 rounded-lg shadow-lg hover:bg-blue-700 transition duration-300 ease-in-out transform hover:scale-105">
                     <i class="fas fa-plus-circle mr-2"></i>Add New Research Grant
@@ -24,6 +24,7 @@
                                 <th class="px-6 py-3">Project Leader</th>
                                 <th class="px-6 py-3">Grant Amount</th>
                                 <th class="px-6 py-3">Start Date</th>
+                                <th class="px-6 py-3">End Date</th>
                                 <th class="px-6 py-3">Duration (Months)</th>
                                 <th class="px-6 py-3">Actions</th>
                             </tr>
@@ -37,8 +38,18 @@
                                         {{ optional($grant->projectLeader)->name ?? 'N/A' }}
                                     </td>
                                     <td class="px-6 py-4 text-sm text-gray-800 dark:text-gray-200">${{ number_format($grant->grant_amount, 2) }}</td>
-                                    <td class="px-6 py-4 text-sm text-gray-800 dark:text-gray-200">{{ \Carbon\Carbon::parse($grant->start_date)->format('M d, Y') }}</td>
-                                    <td class="px-6 py-4 text-sm text-gray-800 dark:text-gray-200">{{ $grant->duration_months }}</td>
+                                    <td class="px-6 py-4 text-sm text-gray-800 dark:text-gray-200 text-center">{{ \Carbon\Carbon::parse($grant->start_date)->format('M d, Y') }}</td>
+                                    
+                                    <!-- Align End Date -->
+                                    <td class="px-6 py-4 text-sm text-gray-800 dark:text-gray-200 text-center">
+                                        {{ \Carbon\Carbon::parse($grant->start_date)->addMonths($grant->duration_months)->format('M d, Y') }}
+                                    </td>
+
+                                    <!-- Align Duration (Months) -->
+                                    <td class="px-6 py-4 text-sm text-gray-800 dark:text-gray-200 text-center">
+                                        {{ $grant->duration_months }}
+                                    </td>
+
                                     <td class="px-6 py-4 text-sm text-gray-800 dark:text-gray-200 flex space-x-4">
                                         <a href="{{ route('researchGrants.show', $grant->id) }}" class="text-blue-600 hover:text-blue-800 transition duration-300">
                                             <i class="fas fa-eye"></i> View

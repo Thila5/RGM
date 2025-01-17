@@ -19,7 +19,8 @@ class AcademicianController extends Controller
             abort(403, 'You do not have permission to view academicians.');
         }
 
-        $academicians = Academician::all();
+        // Use paginate instead of all()
+        $academicians = Academician::paginate(10); // 10 records per page
         return view('academicians.index', compact('academicians'));
     }
 
@@ -37,6 +38,12 @@ class AcademicianController extends Controller
         return view('academicians.create', compact('users'));
     }
 
+
+    public function checkStaffNumber(Request $request)
+{
+    $exists = Academician::where('staff_number', $request->staff_number)->exists();
+    return response()->json(['exists' => $exists]);
+}
     /**
      * Store a newly created resource in storage.
      */
@@ -58,13 +65,6 @@ class AcademicianController extends Controller
             'users_id' => 'required|exists:users,id', // Ensure users_id exists in the users table
         ]);
 
-        // Get the user by the selected user_id
-        $user = User::find($request->users_id);
-
-        if (!$user) {
-            return back()->withErrors(['users_id' => 'Selected user not found.'])->withInput();
-        }
-
         // Create the academician record and associate the user ID
         Academician::create([
             'name' => $validated['name'],
@@ -73,7 +73,7 @@ class AcademicianController extends Controller
             'college' => $validated['college'],
             'department' => $validated['department'],
             'position' => $validated['position'],
-            'users_id' => $user->id, // Associate the user ID
+            'users_id' => $validated['users_id'], // Associate the user ID
         ]);
 
         // Redirect with success message

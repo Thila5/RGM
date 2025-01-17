@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\ProjectMilestone;
-use App\Models\ResearchGrant;
+use App\Models\ProjectMilestone; // Ensure this is correct
+use App\Models\ResearchGrant;    // Ensure this is correct
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use App\Http\Controllers\Controller; // Ensure Controller is imported correctly
 
 class ProjectMilestoneController extends Controller
 {
@@ -61,6 +62,7 @@ class ProjectMilestoneController extends Controller
             'target_completion_date' => 'required|date',
             'deliverable' => 'required|string',
             'status' => 'required|in:Not Started,In Progress,Completed',
+            'remark' => 'nullable|string',
         ]);
 
         ProjectMilestone::create([
@@ -70,6 +72,7 @@ class ProjectMilestoneController extends Controller
             'deliverable' => $request->deliverable,
             'status' => $request->status,
             'remark' => $request->remark,
+            'date_updated' => now(),
         ]);
 
         return redirect()->route('projectMilestones.index')->with('success', 'Project milestone created successfully');
@@ -92,21 +95,20 @@ class ProjectMilestoneController extends Controller
      * Show the form for editing the specified resource.
      */
     public function edit(ProjectMilestone $projectMilestone)
-{
-    // Gate check: Only Project Leader or Admin Executive can edit the milestone
-    if (Gate::denies('edit-project-milestone', $projectMilestone)) {
-        abort(403, 'You do not have permission to edit this project milestone.');
+    {
+        // Gate check: Only Project Leader or Admin Executive can edit the milestone
+        if (Gate::denies('edit-project-milestone', $projectMilestone)) {
+            abort(403, 'You do not have permission to edit this project milestone.');
+        }
+
+        // Get the project leader associated with this project milestone
+        $projectLeaderId = $projectMilestone->researchGrant->project_leader_id;
+
+        // Filter research grants to only those where the current user is the project leader
+        $researchGrants = ResearchGrant::where('project_leader_id', $projectLeaderId)->get();
+
+        return view('projectMilestones.edit', compact('projectMilestone', 'researchGrants'));
     }
-
-    // Get the project leader associated with this project milestone
-    $projectLeaderId = $projectMilestone->researchGrant->project_leader_id; // Assuming you have a relationship 'researchGrant' on ProjectMilestone
-
-    // Filter research grants to only those where the current user is the project leader
-    $researchGrants = ResearchGrant::where('project_leader_id', $projectLeaderId)->get();
-
-    return view('projectMilestones.edit', compact('projectMilestone', 'researchGrants'));
-}
-
 
     /**
      * Update the specified resource in storage.
@@ -124,6 +126,7 @@ class ProjectMilestoneController extends Controller
             'target_completion_date' => 'required|date',
             'deliverable' => 'required|string',
             'status' => 'required|in:Not Started,In Progress,Completed',
+            'remark' => 'nullable|string',
         ]);
 
         $projectMilestone->update([
@@ -133,6 +136,7 @@ class ProjectMilestoneController extends Controller
             'deliverable' => $request->deliverable,
             'status' => $request->status,
             'remark' => $request->remark,
+            'date_updated' => now(),
         ]);
 
         return redirect()->route('projectMilestones.index')->with('success', 'Project milestone updated successfully');
